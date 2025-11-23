@@ -100,28 +100,28 @@
   }
 </style>
   <style>
-  /* Draggable bubble */
   #wellnessBubble {
     position: fixed;
-    bottom: 20px; /* starting position */
-    right: 20px;  /* starting position */
-    width: 70px;
-    height: 70px;
-    background: #4fc3f7;
-    border-radius: 50%;
+    bottom: 20px;
+    right: 20px;
+    min-width: 140px;
+    max-width: 220px;
+    padding: 12px;
+    background: linear-gradient(135deg, #60a5fa, #34d399, #f59e0b);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: bold;
     cursor: grab;
     z-index: 9999;
     user-select: none;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+    font-family: sans-serif;
   }
 
   #wellnessBubble:active {
     cursor: grabbing;
+    transform: scale(1.02);
   }
 </style>
 
@@ -250,9 +250,11 @@
         </div>
 
         <div class="relative">
-		<!-- Wellness Tip Bubble -->
-
-<div id="wellnessBubble">💬</div>
+		<div id="wellnessBubble">
+  <div id="bubbleText" style="text-align:center; padding:8px; font-size:14px; color:white; font-weight:bold;">
+    Loading tip...
+  </div>
+</div>
 
 
 
@@ -639,93 +641,53 @@
   });
 </script>
 <script>
-  const wellnessTips = [
-    "Take a 5-minute mindfulness break.",
-    "Hydrate regularly throughout the day.",
-    "Stretch between classes.",
-    "Connect with a colleague.",
-    "Do a short breathing exercise.",
-    "Organize your workspace.",
-    "Take a slow deep breath."
-  ];
-
   const bubble = document.getElementById("wellnessBubble");
   const bubbleText = document.getElementById("bubbleText");
 
+  // Example tips
+  const tips = [
+    "Take a 5-minute mindfulness break.",
+    "Hydrate regularly to maintain energy.",
+    "Stretch every hour to reduce fatigue.",
+    "Connect with a colleague for support.",
+    "Take a short walk to boost mood.",
+    "Practice deep breathing when stressed."
+  ];
+
   function showRandomTip() {
-    const randomTip = wellnessTips[Math.floor(Math.random() * wellnessTips.length)];
-    bubbleText.textContent = randomTip;
+    const tip = tips[Math.floor(Math.random() * tips.length)];
+    bubbleText.textContent = tip;
   }
 
-  showRandomTip();
+  showRandomTip(); // initial tip
 
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-
-  bubble.addEventListener("pointerdown", (e) => {
-    isDragging = true;
-    startX = e.clientX - bubble.offsetLeft;
-    startY = e.clientY - bubble.offsetTop;
-    bubble.setPointerCapture(e.pointerId);
-  });
-
-  document.addEventListener("pointermove", (e) => {
-    if (!isDragging) return;
-    bubble.style.left = e.clientX - startX + "px";
-    bubble.style.top = e.clientY - startY + "px";
-    bubble.style.right = "auto";
-    bubble.style.bottom = "auto";
-  });
-
-  bubble.addEventListener("pointerup", (e) => {
-    isDragging = false;
-    bubble.releasePointerCapture(e.pointerId);
-  });
-
-  bubble.addEventListener("click", () => {
-    if (!isDragging) {
-      showRandomTip();
-    }
-  });
-</script>
-<script>
-  const bubble = document.getElementById("wellnessBubble");
-
+  // --- Dragging ---
   let offsetX = 0;
   let offsetY = 0;
   let isDragging = false;
 
-  // Start dragging
   bubble.addEventListener("mousedown", startDrag);
   bubble.addEventListener("touchstart", startDrag);
 
-  // Dragging movement
   document.addEventListener("mousemove", drag);
   document.addEventListener("touchmove", drag);
 
-  // Stop dragging
   document.addEventListener("mouseup", stopDrag);
   document.addEventListener("touchend", stopDrag);
 
   function startDrag(e) {
     isDragging = true;
-
     let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
     let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
-
     const rect = bubble.getBoundingClientRect();
-
     offsetX = x - rect.left;
     offsetY = y - rect.top;
   }
 
   function drag(e) {
     if (!isDragging) return;
-
     let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
     let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
-
     bubble.style.left = `${x - offsetX}px`;
     bubble.style.top = `${y - offsetY}px`;
   }
@@ -733,6 +695,11 @@
   function stopDrag() {
     isDragging = false;
   }
+
+  // click to change tip
+  bubble.addEventListener("click", () => {
+    showRandomTip();
+  });
 </script>
 
   <script>
