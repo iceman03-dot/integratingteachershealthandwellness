@@ -115,7 +115,32 @@
     animation: slideOutRight 300ms ease-in forwards;
   }
 </style>
+#bubble {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  font-size: 24px;
+  user-select: none;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+#bubble:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
 <body class="antialiased bg-gradient-to-b from-white via-gray-50 to-white text-gray-900">
+
 
   <!-- HERO / Header -->
   <header class="bg-fire-ice text-white">
@@ -132,6 +157,10 @@
         <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto opacity-95 animate-fadeUp-delay-1">
           Promoting physical, mental, and emotional well-being for teachers.
         </p>
+
+<div id="bubble">
+  💬
+</div>
 
         
       </div>
@@ -627,6 +656,51 @@
     }, { once: true });
   });
 </script>
+<script>
+  const bubble = document.getElementById("bubble");
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
+
+  // Desktop mouse support
+  bubble.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - bubble.getBoundingClientRect().left;
+    offsetY = e.clientY - bubble.getBoundingClientRect().top;
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDragging) {
+      bubble.style.left = e.clientX - offsetX + "px";
+      bubble.style.top = e.clientY - offsetY + "px";
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+  });
+
+  // Mobile touch support
+  bubble.addEventListener("touchstart", (e) => {
+    isDragging = true;
+    const touch = e.touches[0];
+    offsetX = touch.clientX - bubble.getBoundingClientRect().left;
+    offsetY = touch.clientY - bubble.getBoundingClientRect().top;
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    if (isDragging) {
+      const touch = e.touches[0];
+      bubble.style.left = touch.clientX - offsetX + "px";
+      bubble.style.top = touch.clientY - offsetY + "px";
+    }
+  });
+
+  document.addEventListener("touchend", () => {
+    isDragging = false;
+  });
+</script>
+
   <script>
 const scriptURL = https://script.google.com/macros/s/AKfycbznf0VdAucOjRSJdX9q20kszmPAkceiM8B6utWzScy0z_wTGzsOAqWPq8_TN6Yvw5R12A/exec;
 
