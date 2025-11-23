@@ -639,6 +639,57 @@
   });
 </script>
 <script>
+  const wellnessTips = [
+    "Take a 5-minute mindfulness break.",
+    "Hydrate regularly throughout the day.",
+    "Stretch between classes.",
+    "Connect with a colleague.",
+    "Do a short breathing exercise.",
+    "Organize your workspace.",
+    "Take a slow deep breath."
+  ];
+
+  const bubble = document.getElementById("wellnessBubble");
+  const bubbleText = document.getElementById("bubbleText");
+
+  function showRandomTip() {
+    const randomTip = wellnessTips[Math.floor(Math.random() * wellnessTips.length)];
+    bubbleText.textContent = randomTip;
+  }
+
+  showRandomTip();
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  bubble.addEventListener("pointerdown", (e) => {
+    isDragging = true;
+    startX = e.clientX - bubble.offsetLeft;
+    startY = e.clientY - bubble.offsetTop;
+    bubble.setPointerCapture(e.pointerId);
+  });
+
+  document.addEventListener("pointermove", (e) => {
+    if (!isDragging) return;
+    bubble.style.left = e.clientX - startX + "px";
+    bubble.style.top = e.clientY - startY + "px";
+    bubble.style.right = "auto";
+    bubble.style.bottom = "auto";
+  });
+
+  bubble.addEventListener("pointerup", (e) => {
+    isDragging = false;
+    bubble.releasePointerCapture(e.pointerId);
+  });
+
+  bubble.addEventListener("click", () => {
+    if (!isDragging) {
+      showRandomTip();
+    }
+  });
+</script>
+<script>
   const bubble = document.getElementById("wellnessBubble");
 
   let offsetX = 0;
@@ -684,6 +735,7 @@
   }
 </script>
 
+  <script>
 const scriptURL = https://script.google.com/macros/s/AKfycbznf0VdAucOjRSJdX9q20kszmPAkceiM8B6utWzScy0z_wTGzsOAqWPq8_TN6Yvw5R12A/exec;
 
 document.getElementById("contactForm").addEventListener("submit", e => {
