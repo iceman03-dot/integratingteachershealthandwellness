@@ -81,53 +81,85 @@
 .quote-display.show {
     opacity: 1;
 }
-<style>
-  /* Draggable bubble styles */
-  #wellnessBubble {
-    position: fixed;
-    width: 240px;            /* keep your width that fits content; adjust if needed */
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 14px;
-    background: linear-gradient(to right, #60a5fa, #34d399, #f59e0b);
-    color: #012;
-    box-shadow: 0 8px 24px rgba(2,6,23,0.18);
-    z-index: 9999;
-    cursor: grab;
-    user-select: none;
-    touch-action: none; /* IMPORTANT for pointer dragging on touch devices */
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  #wellnessBubble:active { cursor: grabbing; transform: scale(1.02); transition: transform .12s; }
+<!-- ========== GLOBAL ANIMATIONS / QUOTE STYLES ========== -->
+  <style>
+    .scale-in {
+      animation: scaleIn 0.2s ease-out;
+    }
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
 
-  /* small handle icon (optional) */
-  #wellnessBubble .handle {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    border-radius: 999px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    box-shadow: 0 6px 14px rgba(2,6,23,0.12);
-    background: rgba(255,255,255,0.18);
-  }
+    .quote-display {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
 
-  /* subtle text area */
-  #wellnessBubble .text {
-    font-size: 14px;
-    line-height:1.1;
-    color: #021627;
-    opacity: 0.98;
-  }
+    .quote-display.show {
+      opacity: 1;
+    }
+  </style>
 
-  /* small helper for accessibility focus */
-  #wellnessBubble:focus { outline: 3px solid rgba(6,182,212,0.18); border-radius: 14px; }
-</style>
+  <!-- ========== DRAGGABLE BUBBLE STYLES (CORRECTED) ========== -->
+  <style>
+    #wellnessBubble {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(to right, #60a5fa, #34d399, #f59e0b);
+      color: #012;
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      font-size: 14px;
+      max-width: 240px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: grab;
+      z-index: 9999;
+      user-select: none;
+      touch-action: none; /* IMPORTANT for dragging */
+    }
+
+    #wellnessBubble:active {
+      cursor: grabbing;
+      transform: scale(1.04);
+    }
+
+    #wellnessBubble .icon {
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+<!-- ========== SLIDE-IN / MOBILE MENU ANIMATIONS ========== -->
+  <style>
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+
+    @keyframes slideOutRight {
+      from { transform: translateX(0); }
+      to   { transform: translateX(100%); }
+    }
+
+    .animate-slide-in {
+      animation: slideInRight 300ms ease-out forwards;
+    }
+
+    .animate-slide-out {
+      animation: slideOutRight 300ms ease-in forwards;
+    }
+  </style>
+  </style>
 </head>
 <style>
   @keyframes slideInRight {
@@ -273,11 +305,10 @@
         <div class="relative">
 		<!-- Wellness Tip Bubble -->
 
-<div id="wellnessBubble" role="button" aria-label="Wellness tip. Drag to move. Tap to change tip." tabindex="0">
-  <div class="handle">💡</div>
-  <div class="text" id="bubbleText">Loading tip...</div>
+<div id="wellnessBubble">
+  <span class="icon">💡</span>
+  <span id="bubbleText">Loading tip...</span>
 </div>
-
 
 
 
@@ -433,9 +464,13 @@
     </div>
   </div>
 </section>
+
+<!-- Load Lucide icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
-(function() {
-  // tips (you may keep your existing array)
+  lucide.createIcons();
+</script>
+<script>
   const wellnessTips = [
     "Take a 5-minute mindfulness break between classes.",
     "Hydrate regularly to maintain energy and focus.",
@@ -446,143 +481,14 @@
     "Keep your workspace organized to reduce mental clutter."
   ];
 
-  const bubble = document.getElementById("wellnessBubble");
-  const bubbleText = document.getElementById("bubbleText");
-
-  // showRandomTip function (kept from your earlier code)
   function showRandomTip() {
+    const bubble = document.getElementById("bubbleText");
     const randomTip = wellnessTips[Math.floor(Math.random() * wellnessTips.length)];
-    bubbleText.textContent = randomTip;
+    bubble.textContent = randomTip;
   }
 
-  // initialize tip on load
+  // Show a tip on page load
   showRandomTip();
-
-  // --- Dragging logic (pointer events) ---
-  let isDragging = false;
-  let startX = 0, startY = 0;      // pointer start
-  let origLeft = 0, origTop = 0;   // element start
-  let moved = false;
-
-  const storageKey = "wellnessBubblePos_v1";
-
-  // helpers
-  function constrain(x, y, w, h) {
-    const maxX = window.innerWidth - w - 8; // 8px margin
-    const maxY = window.innerHeight - h - 8;
-    const nx = Math.max(8, Math.min(maxX, x));
-    const ny = Math.max(8, Math.min(maxY, y));
-    return [nx, ny];
-  }
-
-  function setPositionPx(x, y) {
-    // Set left/top and remove right/bottom so it's controllable
-    bubble.style.left = x + "px";
-    bubble.style.top = y + "px";
-    bubble.style.right = "auto";
-    bubble.style.bottom = "auto";
-  }
-
-  // load saved pos or default
-  function restorePosition() {
-    const rect = bubble.getBoundingClientRect();
-    const w = rect.width, h = rect.height;
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      try {
-        const { left, top } = JSON.parse(saved);
-        const [nx, ny] = constrain(left, top, w, h);
-        setPositionPx(nx, ny);
-        return;
-      } catch(e) { /* fall through */ }
-    }
-    // default: bottom-right-ish
-    const defaultX = window.innerWidth - w - 20;
-    const defaultY = window.innerHeight - h - 120;
-    const [dx, dy] = constrain(defaultX, defaultY, w, h);
-    setPositionPx(dx, dy);
-  }
-
-  // save
-  function savePosition() {
-    const rect = bubble.getBoundingClientRect();
-    const left = Math.round(rect.left);
-    const top = Math.round(rect.top);
-    localStorage.setItem(storageKey, JSON.stringify({ left, top }));
-  }
-
-  // pointer down
-  bubble.addEventListener("pointerdown", (e) => {
-    // only left button or touch/pen
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    isDragging = true;
-    moved = false;
-    startX = e.clientX;
-    startY = e.clientY;
-    const rect = bubble.getBoundingClientRect();
-    origLeft = rect.left;
-    origTop = rect.top;
-    bubble.setPointerCapture(e.pointerId);
-  });
-
-  // pointer move
-  document.addEventListener("pointermove", (e) => {
-    if (!isDragging) return;
-    // compute new pos
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    const newLeft = origLeft + dx;
-    const newTop = origTop + dy;
-    const rect = bubble.getBoundingClientRect();
-    const [nx, ny] = constrain(newLeft, newTop, rect.width, rect.height);
-    setPositionPx(nx, ny);
-    // small threshold to differentiate click vs drag
-    if (Math.hypot(dx, dy) > 6) moved = true;
-    e.preventDefault();
-  }, { passive: false });
-
-  // pointer up / cancel
-  bubble.addEventListener("pointerup", (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    try { bubble.releasePointerCapture(e.pointerId); } catch (err) {}
-    // if it was a click (not moved), show a new tip
-    if (!moved) {
-      showRandomTip();
-    } else {
-      // if moved, save new position
-      savePosition();
-    }
-  });
-
-  bubble.addEventListener("pointercancel", () => {
-    isDragging = false;
-  });
-
-  // keyboard accessibility: Enter or Space will show a new tip
-  bubble.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      showRandomTip();
-    }
-  });
-
-  // handle window resize: keep bubble inside viewport
-  window.addEventListener("resize", () => {
-    const rect = bubble.getBoundingClientRect();
-    const [nx, ny] = constrain(rect.left, rect.top, rect.width, rect.height);
-    setPositionPx(nx, ny);
-    savePosition();
-  });
-
-  // initialize after DOM layout
-  // small timeout helps when styles/ fonts change element size
-  window.requestAnimationFrame(() => {
-    restorePosition();
-  });
-
-})();
-
 
   // Optional: click to get a new tip
   document.getElementById("wellnessBubble").addEventListener("click", showRandomTip);
@@ -788,50 +694,56 @@
   });
 </script>
 <script>
-  const bubble = document.getElementById("bubble");
-  let offsetX = 0;
-  let offsetY = 0;
+  const wellnessTips = [
+    "Take a 5-minute mindfulness break.",
+    "Hydrate regularly throughout the day.",
+    "Stretch between classes.",
+    "Connect with a colleague.",
+    "Do a short breathing exercise.",
+    "Organize your workspace.",
+    "Take a slow deep breath."
+  ];
+
+  const bubble = document.getElementById("wellnessBubble");
+  const bubbleText = document.getElementById("bubbleText");
+
+  function showRandomTip() {
+    const randomTip = wellnessTips[Math.floor(Math.random() * wellnessTips.length)];
+    bubbleText.textContent = randomTip;
+  }
+
+  showRandomTip();
+
   let isDragging = false;
+  let startX = 0;
+  let startY = 0;
 
-  // Desktop mouse support
-  bubble.addEventListener("mousedown", (e) => {
+  bubble.addEventListener("pointerdown", (e) => {
     isDragging = true;
-    offsetX = e.clientX - bubble.getBoundingClientRect().left;
-    offsetY = e.clientY - bubble.getBoundingClientRect().top;
+    startX = e.clientX - bubble.offsetLeft;
+    startY = e.clientY - bubble.offsetTop;
+    bubble.setPointerCapture(e.pointerId);
   });
 
-  document.addEventListener("mousemove", (e) => {
-    if (isDragging) {
-      bubble.style.left = e.clientX - offsetX + "px";
-      bubble.style.top = e.clientY - offsetY + "px";
-    }
+  document.addEventListener("pointermove", (e) => {
+    if (!isDragging) return;
+    bubble.style.left = e.clientX - startX + "px";
+    bubble.style.top = e.clientY - startY + "px";
+    bubble.style.right = "auto";
+    bubble.style.bottom = "auto";
   });
 
-  document.addEventListener("mouseup", () => {
+  bubble.addEventListener("pointerup", (e) => {
     isDragging = false;
+    bubble.releasePointerCapture(e.pointerId);
   });
 
-  // Mobile touch support
-  bubble.addEventListener("touchstart", (e) => {
-    isDragging = true;
-    const touch = e.touches[0];
-    offsetX = touch.clientX - bubble.getBoundingClientRect().left;
-    offsetY = touch.clientY - bubble.getBoundingClientRect().top;
-  });
-
-  document.addEventListener("touchmove", (e) => {
-    if (isDragging) {
-      const touch = e.touches[0];
-      bubble.style.left = touch.clientX - offsetX + "px";
-      bubble.style.top = touch.clientY - offsetY + "px";
+  bubble.addEventListener("click", () => {
+    if (!isDragging) {
+      showRandomTip();
     }
-  });
-
-  document.addEventListener("touchend", () => {
-    isDragging = false;
   });
 </script>
-
   <script>
 const scriptURL = https://script.google.com/macros/s/AKfycbznf0VdAucOjRSJdX9q20kszmPAkceiM8B6utWzScy0z_wTGzsOAqWPq8_TN6Yvw5R12A/exec;
 
