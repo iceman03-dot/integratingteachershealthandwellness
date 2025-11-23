@@ -81,84 +81,6 @@
 .quote-display.show {
     opacity: 1;
 }
-<!-- ========== GLOBAL ANIMATIONS / QUOTE STYLES ========== -->
-  <style>
-    .scale-in {
-      animation: scaleIn 0.2s ease-out;
-    }
-    @keyframes scaleIn {
-      from {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .quote-display {
-      opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-    }
-
-    .quote-display.show {
-      opacity: 1;
-    }
-  </style>
-
-  <!-- ========== DRAGGABLE BUBBLE STYLES (CORRECTED) ========== -->
-  <style>
-    #wellnessBubble {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(to right, #60a5fa, #34d399, #f59e0b);
-      color: #012;
-      padding: 12px 16px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      font-size: 14px;
-      max-width: 240px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: grab;
-      z-index: 9999;
-      user-select: none;
-      touch-action: none; /* IMPORTANT for dragging */
-    }
-
-    #wellnessBubble:active {
-      cursor: grabbing;
-      transform: scale(1.04);
-    }
-
-    #wellnessBubble .icon {
-      font-size: 22px;
-      font-weight: bold;
-    }
-  </style>
-<!-- ========== SLIDE-IN / MOBILE MENU ANIMATIONS ========== -->
-  <style>
-    @keyframes slideInRight {
-      from { transform: translateX(100%); }
-      to   { transform: translateX(0); }
-    }
-
-    @keyframes slideOutRight {
-      from { transform: translateX(0); }
-      to   { transform: translateX(100%); }
-    }
-
-    .animate-slide-in {
-      animation: slideInRight 300ms ease-out forwards;
-    }
-
-    .animate-slide-out {
-      animation: slideOutRight 300ms ease-in forwards;
-    }
-  </style>
   </style>
 </head>
 <style>
@@ -177,7 +99,32 @@
     animation: slideOutRight 300ms ease-in forwards;
   }
 </style>
-  
+  <style>
+  /* Draggable bubble */
+  #wellnessBubble {
+    position: fixed;
+    bottom: 20px; /* starting position */
+    right: 20px;  /* starting position */
+    width: 70px;
+    height: 70px;
+    background: #4fc3f7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    cursor: grab;
+    z-index: 9999;
+    user-select: none;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  }
+
+  #wellnessBubble:active {
+    cursor: grabbing;
+  }
+</style>
+
 
 <body class="antialiased bg-gradient-to-b from-white via-gray-50 to-white text-gray-900">
 
@@ -305,10 +252,8 @@
         <div class="relative">
 		<!-- Wellness Tip Bubble -->
 
-<div id="wellnessBubble">
-  <span class="icon">💡</span>
-  <span id="bubbleText">Loading tip...</span>
-</div>
+<div id="wellnessBubble">💬</div>
+
 
 
 
@@ -694,57 +639,51 @@
   });
 </script>
 <script>
-  const wellnessTips = [
-    "Take a 5-minute mindfulness break.",
-    "Hydrate regularly throughout the day.",
-    "Stretch between classes.",
-    "Connect with a colleague.",
-    "Do a short breathing exercise.",
-    "Organize your workspace.",
-    "Take a slow deep breath."
-  ];
-
   const bubble = document.getElementById("wellnessBubble");
-  const bubbleText = document.getElementById("bubbleText");
 
-  function showRandomTip() {
-    const randomTip = wellnessTips[Math.floor(Math.random() * wellnessTips.length)];
-    bubbleText.textContent = randomTip;
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
+
+  // Start dragging
+  bubble.addEventListener("mousedown", startDrag);
+  bubble.addEventListener("touchstart", startDrag);
+
+  // Dragging movement
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("touchmove", drag);
+
+  // Stop dragging
+  document.addEventListener("mouseup", stopDrag);
+  document.addEventListener("touchend", stopDrag);
+
+  function startDrag(e) {
+    isDragging = true;
+
+    let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+    let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
+
+    const rect = bubble.getBoundingClientRect();
+
+    offsetX = x - rect.left;
+    offsetY = y - rect.top;
   }
 
-  showRandomTip();
-
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-
-  bubble.addEventListener("pointerdown", (e) => {
-    isDragging = true;
-    startX = e.clientX - bubble.offsetLeft;
-    startY = e.clientY - bubble.offsetTop;
-    bubble.setPointerCapture(e.pointerId);
-  });
-
-  document.addEventListener("pointermove", (e) => {
+  function drag(e) {
     if (!isDragging) return;
-    bubble.style.left = e.clientX - startX + "px";
-    bubble.style.top = e.clientY - startY + "px";
-    bubble.style.right = "auto";
-    bubble.style.bottom = "auto";
-  });
 
-  bubble.addEventListener("pointerup", (e) => {
+    let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+    let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
+
+    bubble.style.left = `${x - offsetX}px`;
+    bubble.style.top = `${y - offsetY}px`;
+  }
+
+  function stopDrag() {
     isDragging = false;
-    bubble.releasePointerCapture(e.pointerId);
-  });
-
-  bubble.addEventListener("click", () => {
-    if (!isDragging) {
-      showRandomTip();
-    }
-  });
+  }
 </script>
-  <script>
+
 const scriptURL = https://script.google.com/macros/s/AKfycbznf0VdAucOjRSJdX9q20kszmPAkceiM8B6utWzScy0z_wTGzsOAqWPq8_TN6Yvw5R12A/exec;
 
 document.getElementById("contactForm").addEventListener("submit", e => {
