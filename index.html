@@ -588,7 +588,9 @@
 
   // Close menu when clicking outside sidebar
   mobileMenu.addEventListener('click', (e) => {
-    if(e.target === mobileMenu) closeMenu.click();
+    if(e.target === mobileMenu) {
+      closeMenu.click();
+    }
   });
 </script>
   <script>
