@@ -51,31 +51,7 @@
 
     /* accessible focus */
     .focus-ring:focus { outline: none; box-shadow: 0 0 0 4px rgba(6,182,212,0.18); border-radius: 0.5rem; }
-	#bubble {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: grab;
-  font-size: 24px;
-  user-select: none;
-  z-index: 9999;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease;
-}
-#bubble:active {
-  cursor: grabbing;
-  transform: scale(1.1);
-}
-
-
+	
 /* Jiggle + glow animation */
 .resource-bubble.animate {
     animation: bubblePop 0.6s ease-out;
@@ -146,6 +122,29 @@
 <div id="bubble">
   💬
 </div>
+#bubble {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  font-size: 24px;
+  user-select: none;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+#bubble:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
 
         
       </div>
