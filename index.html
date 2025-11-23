@@ -153,7 +153,17 @@
            w-64 sm:w-80   <!-- Wider on tablets -->
            transform transition-transform duration-300 ease-in-out
            -translate-x-full">
-    
+		   
+     <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button id="menuButton" aria-label="Open menu" class="p-2 rounded-md focus-ring">
+          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
     <button id="closeMenu" class="mb-6 px-3 py-2 bg-blue-500 hover:bg-blue-700 rounded-lg">
       ✕ Close
     </button>
