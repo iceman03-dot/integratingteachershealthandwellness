@@ -569,33 +569,25 @@
 <script>
   const menuButton = document.getElementById('menuButton');
   const mobileMenu = document.getElementById('mobileMenu');
-  const sidebarPanel = document.getElementById('sidebarPanel');
   const closeMenu = document.getElementById('closeMenu');
 
   menuButton.addEventListener('click', () => {
     mobileMenu.classList.remove('hidden');
     setTimeout(() => {
-      sidebarPanel.classList.remove('-translate-x-full');
-
-      // Push content right on tablets only
-      if (window.innerWidth >= 640) {
-        document.body.style.transform = "translateX(80px)";
-      }
+      mobileMenu.querySelector('div').classList.remove('-translate-x-full');
     }, 10);
   });
 
   closeMenu.addEventListener('click', () => {
-    sidebarPanel.classList.add('-translate-x-full');
-
-    // Reset content shift
-    document.body.style.transform = "translateX(0px)";
-
+    mobileMenu.querySelector('div').classList.add('-translate-x-full');
     setTimeout(() => mobileMenu.classList.add('hidden'), 300);
   });
 
-  // Close menu if user clicks the overlay
+  // Close menu when clicking outside sidebar
   mobileMenu.addEventListener('click', (e) => {
-    if (e.target === mobileMenu) closeMenu.click();
+    if(e.target === mobileMenu) {
+      closeMenu.click();
+    }
   });
 </script>
   <script>
