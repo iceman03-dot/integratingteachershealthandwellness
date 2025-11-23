@@ -141,36 +141,34 @@
         <a href="#contact" class="hover:underline hover:text-orange-500 transition">Contact</a>
       </div>
 
-      <!-- Mobile menu button -->
-      <div class="md:hidden">
-        <button id="menuButton" aria-label="Open menu" class="p-2 rounded-md focus-ring">
-          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mobile sidebar -->
+     <!-- Mobile + Tablet Sidebar -->
 <div id="mobileMenu" class="fixed inset-0 z-50 hidden">
-  <!-- Semi-transparent overlay -->
+  
+  <!-- Overlay -->
   <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
   <!-- Sidebar -->
-  <div class="absolute top-0 left-0 w-64 h-full bg-blue-600 text-white shadow-lg p-6 transform transition-transform -translate-x-full">
-    <button id="closeMenu" class="mb-8 p-2 rounded-md focus-ring bg-blue-500 hover:bg-blue-700">
+  <div id="sidebarPanel"
+    class="absolute top-0 left-0 h-full bg-blue-600 text-white shadow-xl p-6
+           w-64 sm:w-80   <!-- Wider on tablets -->
+           transform transition-transform duration-300 ease-in-out
+           -translate-x-full">
+    
+    <button id="closeMenu" class="mb-6 px-3 py-2 bg-blue-500 hover:bg-blue-700 rounded-lg">
       ✕ Close
     </button>
-    <nav class="flex flex-col space-y-4">
-      <a href="#about" class="hover:underline hover:text-gray-200">About</a>
-      <a href="#benefits" class="hover:underline hover:text-gray-200">Benefits</a>
-      <a href="#strategies" class="hover:underline hover:text-gray-200">Strategies</a>
-      <a href="#programs" class="hover:underline hover:text-gray-200">Programs</a>
-      <a href="#resources" class="hover:underline hover:text-gray-200">Resources</a>
-      <a href="#contact" class="hover:underline hover:text-gray-200">Contact</a>
+
+    <nav class="flex flex-col space-y-4 text-lg font-medium">
+      <a href="#about" class="hover:text-gray-200">About</a>
+      <a href="#benefits" class="hover:text-gray-200">Benefits</a>
+      <a href="#strategies" class="hover:text-gray-200">Strategies</a>
+      <a href="#programs" class="hover:text-gray-200">Programs</a>
+      <a href="#resources" class="hover:text-gray-200">Resources</a>
+      <a href="#contact" class="hover:text-gray-200">Contact</a>
     </nav>
+
   </div>
+</div>
 </div>
     </div>
   </div>
@@ -572,25 +570,33 @@
 <script>
   const menuButton = document.getElementById('menuButton');
   const mobileMenu = document.getElementById('mobileMenu');
+  const sidebarPanel = document.getElementById('sidebarPanel');
   const closeMenu = document.getElementById('closeMenu');
 
   menuButton.addEventListener('click', () => {
     mobileMenu.classList.remove('hidden');
     setTimeout(() => {
-      mobileMenu.querySelector('div').classList.remove('-translate-x-full');
+      sidebarPanel.classList.remove('-translate-x-full');
+
+      // Push content right on tablets only
+      if (window.innerWidth >= 640) {
+        document.body.style.transform = "translateX(80px)";
+      }
     }, 10);
   });
 
   closeMenu.addEventListener('click', () => {
-    mobileMenu.querySelector('div').classList.add('-translate-x-full');
+    sidebarPanel.classList.add('-translate-x-full');
+
+    // Reset content shift
+    document.body.style.transform = "translateX(0px)";
+
     setTimeout(() => mobileMenu.classList.add('hidden'), 300);
   });
 
-  // Close menu when clicking outside sidebar
+  // Close menu if user clicks the overlay
   mobileMenu.addEventListener('click', (e) => {
-    if(e.target === mobileMenu) {
-      closeMenu.click();
-    }
+    if (e.target === mobileMenu) closeMenu.click();
   });
 </script>
   <script>
