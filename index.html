@@ -153,23 +153,25 @@
   </div>
 
   <!-- Mobile sidebar -->
-  <div id="mobileMenu" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden">
-    <div class="fixed top-0 left-0 w-64 h-full bg-black-lg p-6 transform transition-transform -translate-x-full">
-      <button id="closeMenu" class="mb-8 p-2 rounded-md focus-ring">
-        ✕ Close
-      </button>
-      <nav class="flex flex-col space-y-4 text-blue-900">
-        <a href="#about" class="hover:underline">About</a>
-        <a href="#benefits" class="hover:underline">Benefits</a>
-        <a href="#strategies" class="hover:underline">Strategies</a>
-        <a href="#programs" class="hover:underline">Programs</a>
-        <a href="#resources" class="hover:underline">Resources</a>
-        <a href="#contact" class="hover:underline">Contact</a>
-      </nav>
-    </div>
+<div id="mobileMenu" class="fixed inset-0 z-50 hidden">
+  <!-- Semi-transparent overlay -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+  <!-- Sidebar -->
+  <div class="absolute top-0 left-0 w-64 h-full bg-blue-600 text-white shadow-lg p-6 transform transition-transform -translate-x-full">
+    <button id="closeMenu" class="mb-8 p-2 rounded-md focus-ring bg-blue-500 hover:bg-blue-700">
+      ✕ Close
+    </button>
+    <nav class="flex flex-col space-y-4">
+      <a href="#about" class="hover:underline hover:text-gray-200">About</a>
+      <a href="#benefits" class="hover:underline hover:text-gray-200">Benefits</a>
+      <a href="#strategies" class="hover:underline hover:text-gray-200">Strategies</a>
+      <a href="#programs" class="hover:underline hover:text-gray-200">Programs</a>
+      <a href="#resources" class="hover:underline hover:text-gray-200">Resources</a>
+      <a href="#contact" class="hover:underline hover:text-gray-200">Contact</a>
+    </nav>
   </div>
-</nav>
-      </nav>
+</div>
     </div>
   </div>
 </nav>
@@ -586,9 +588,7 @@
 
   // Close menu when clicking outside sidebar
   mobileMenu.addEventListener('click', (e) => {
-    if(e.target === mobileMenu) {
-      closeMenu.click();
-    }
+    if(e.target === mobileMenu) closeMenu.click();
   });
 </script>
   <script>
