@@ -103,31 +103,21 @@
   <style>
   #wellnessBubble {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 240px;
-	max width:80%;
-    padding: 12px;
-    background: linear-gradient(135deg, #60a5fa, #34d399, #f59e0b);
+    left: 100px; 
+    top: 100px;  
+    width: 220px; 
+    padding: 12px 16px;
+    background: linear-gradient(to right, #60a5fa, #34d399, #f59e0b);
+    color: #012;
     border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: grab;
-    z-index: 9999;
     user-select: none;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
-    font-family: sans-serif;
-	gap: 8px;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(2,6,23,0.18);
   }
-
   #wellnessBubble:active {
     cursor: grabbing;
-#wellnessBubble {
-	transition: transform 0.1s ease;
   }
-#wellnessBubble.click-pop{
-transform: scale(1.00);
 </style>
 
 
@@ -255,10 +245,8 @@ transform: scale(1.00);
         </div>
 
         <div class="relative">
-		<div id="wellnessBubble">
-  <div id="bubbleText" style="text-align:center; padding:8px; font-size:14px; color:white; font-weight:bold;">
-    Loading tip...
-  </div>
+		<div id="wellnessBubble" tabindex="0" role="button" aria-label="Wellness tip. Drag to move. Tap to change tip.">
+  <div id="bubbleText">Loading tip...</div>
 </div>
      
         </div>
@@ -642,72 +630,49 @@ transform: scale(1.00);
   });
 </script>
 <script>
-  const bubble = document.getElementById("wellnessBubble");
-  const bubbleText = document.getElementById("bubbleText");
+const tips = [
+  "Take a 5-minute mindfulness break between classes.",
+  "Hydrate regularly to maintain energy and focus.",
+  "Stand up and stretch every hour to reduce fatigue.",
+  "Connect with a colleague for emotional support.",
+  "Schedule short daily walks to boost mood and creativity.",
+  "Practice deep breathing exercises when stressed.",
+  "Keep your workspace organized to reduce mental clutter."
+];
 
-  // Example tips
-  const tips = [
-    "Take a 5-minute mindfulness break.",
-    "Hydrate regularly to maintain energy.",
-    "Stretch every hour to reduce fatigue.",
-    "Connect with a colleague for support.",
-    "Take a short walk to boost mood.",
-    "Practice deep breathing when stressed."
-  ];
+const bubble = document.getElementById('wellnessBubble');
+const bubbleText = document.getElementById('bubbleText');
 
-  function showRandomTip() {
-    const tip = tips[Math.floor(Math.random() * tips.length)];
-    bubbleText.textContent = tip;
-  }
+// initialize tip
+bubbleText.textContent = tips[0];
 
-  showRandomTip(); // initial tip
+let isDragging = false;
+let offsetX = 0, offsetY = 0;
 
-  // --- Dragging ---
-  let offsetX = 0;
-  let offsetY = 0;
-  let isDragging = false;
-
-bubble.addEventListener("click", () => {
-  bubble.classList.add("click-pop");
-  setTimeout(() => bubble.classList.remove("click-pop"), 150); // tiny pop effect
-  showRandomTip();
+bubble.addEventListener('pointerdown', e => {
+  isDragging = true;
+  offsetX = e.clientX - bubble.offsetLeft;
+  offsetY = e.clientY - bubble.offsetTop;
+  bubble.setPointerCapture(e.pointerId);
 });
 
-  bubble.addEventListener("mousedown", startDrag);
-  bubble.addEventListener("touchstart", startDrag);
+bubble.addEventListener('pointermove', e => {
+  if (!isDragging) return;
+  bubble.style.left = (e.clientX - offsetX) + 'px';
+  bubble.style.top = (e.clientY - offsetY) + 'px';
+});
 
-  document.addEventListener("mousemove", drag);
-  document.addEventListener("touchmove", drag);
+bubble.addEventListener('pointerup', e => {
+  isDragging = false;
+  bubble.releasePointerCapture(e.pointerId);
+});
 
-  document.addEventListener("mouseup", stopDrag);
-  document.addEventListener("touchend", stopDrag);
-
-  function startDrag(e) {
-    isDragging = true;
-    let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
-    let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
-    const rect = bubble.getBoundingClientRect();
-    offsetX = x - rect.left;
-    offsetY = y - rect.top;
-  }
-
-  function drag(e) {
-    if (!isDragging) return;
-    let x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
-    let y = e.type.includes("mouse") ? e.clientY : e.touches[0].clientY;
-    bubble.style.left = `${x - offsetX}px`;
-    bubble.style.top = `${y - offsetY}px`;
-  }
-
-  function stopDrag() {
-    isDragging = false;
-  }
-
-  // click to change tip
-  bubble.addEventListener("click", () => {
-    showRandomTip();
-  });
+bubble.addEventListener('click', () => {
+  const tip = tips[Math.floor(Math.random() * tips.length)];
+  bubbleText.textContent = tip;
+});
 </script>
+
   <script>
 const scriptURL = https://script.google.com/macros/s/AKfycbznf0VdAucOjRSJdX9q20kszmPAkceiM8B6utWzScy0z_wTGzsOAqWPq8_TN6Yvw5R12A/exec;
 
