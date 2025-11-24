@@ -666,6 +666,12 @@ transform: scale(1.00);
   let offsetY = 0;
   let isDragging = false;
 
+bubble.addEventListener("click", () => {
+  bubble.classList.add("click-pop");
+  setTimeout(() => bubble.classList.remove("click-pop"), 150); // tiny pop effect
+  showRandomTip();
+});
+
   bubble.addEventListener("mousedown", startDrag);
   bubble.addEventListener("touchstart", startDrag);
 
